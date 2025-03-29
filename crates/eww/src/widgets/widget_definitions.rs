@@ -1,5 +1,7 @@
 #![allow(clippy::option_map_unit_fn)]
-use super::{build_widget::BuilderArgs, circular_progressbar::*, run_command, transform::*};
+use super::{
+    build_widget::BuilderArgs, circular_progressbar::*, floating_background::FloatingBackground, run_command, transform::*,
+};
 use crate::{
     def_widget, enum_parse, error_handling_ctx,
     util::{self, list_difference},
@@ -64,6 +66,7 @@ pub const BUILTIN_WIDGET_NAMES: &[&str] = &[
     WIDGET_NAME_EVENTBOX,
     WIDGET_NAME_TOOLTIP,
     WIDGET_NAME_CIRCULAR_PROGRESS,
+    WIDGET_NAME_FLOATING_BACKGROUND,
     WIDGET_NAME_GRAPH,
     WIDGET_NAME_TRANSFORM,
     WIDGET_NAME_SCALE,
@@ -94,6 +97,7 @@ pub(super) fn widget_use_to_gtk_widget(bargs: &mut BuilderArgs) -> Result<gtk::W
         WIDGET_NAME_EVENTBOX => build_gtk_event_box(bargs)?.upcast(),
         WIDGET_NAME_TOOLTIP => build_tooltip(bargs)?.upcast(),
         WIDGET_NAME_CIRCULAR_PROGRESS => build_circular_progress_bar(bargs)?.upcast(),
+        WIDGET_NAME_FLOATING_BACKGROUND => build_floating_background(bargs)?.upcast(),
         WIDGET_NAME_GRAPH => build_graph(bargs)?.upcast(),
         WIDGET_NAME_TRANSFORM => build_transform(bargs)?.upcast(),
         WIDGET_NAME_SCALE => build_gtk_scale(bargs)?.upcast(),
@@ -1241,6 +1245,26 @@ fn build_circular_progress_bar(bargs: &mut BuilderArgs) -> Result<CircProg> {
         prop(thickness: as_f64) { w.set_property("thickness", thickness); },
         // @prop clockwise - wether the progress bar spins clockwise or counter clockwise
         prop(clockwise: as_bool) { w.set_property("clockwise", clockwise); },
+    });
+    Ok(w)
+}
+
+const WIDGET_NAME_FLOATING_BACKGROUND: &str = "floating-background";
+/// @widget floating-background
+/// @desc Background to use as a parent for the bar, it can transition between floating and not floating
+/// smoothly
+fn build_floating_background(bargs: &mut BuilderArgs) -> Result<FloatingBackground> {
+    let w = FloatingBackground::new();
+    def_widget!(bargs, _g, w, {
+        // @prop flaoting - wether the background should be floating (ie. with max_margin and
+        // max_radius)
+        prop(floating: as_bool) { w.set_property("floating", floating); },
+        // @prop max-margin - the margin when floating
+        prop(max_margin: as_f64) { w.set_property("max-margin", max_margin); },
+        // @prop max-radius - the radius when floating, between 0 - 360
+        prop(max_radius: as_f64) { w.set_property("max-radius", max_radius); },
+        // @prop floating-opacity - the opacity when floating, between 0.0 - 1.0
+        prop(floating_opacity: as_f64) { w.set_property("floating-opacity", floating_opacity); },
     });
     Ok(w)
 }

@@ -3,6 +3,7 @@ use std::process::Command;
 pub mod build_widget;
 pub mod circular_progressbar;
 pub mod def_widget_macro;
+pub mod floating_background;
 pub mod graph;
 mod systray;
 pub mod transform;
